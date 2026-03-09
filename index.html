@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Media Taxonomy</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<style>
+:root { --brand-magenta: #E31C79; --brand-navy: #1B2A4A; }
+body { background: #f8f9fa; font-family: system-ui, -apple-system, sans-serif; }
+.brand-bar { background: var(--brand-navy); }
+.brand-bar h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.02em; }
+.brand-bar .subtitle { color: rgba(255,255,255,0.6); font-size: 0.85rem; }
+.nav-pills .nav-link.active { background: var(--brand-navy); }
+.nav-pills .nav-link { color: var(--brand-navy); }
+.card { border-color: #dee2e6; }
+.card-header { background: #fff; cursor: pointer; }
+.card-header:hover { background: #f8f9fa; }
+.badge-funnel-awareness { background: #0dcaf0; color: #000; }
+.badge-funnel-consideration { background: #ffc107; color: #000; }
+.badge-funnel-conversion { background: #198754; color: #fff; }
+.taxonomy-columns { column-count: 3; column-gap: 1rem; }
+@media (max-width: 1199.98px) { .taxonomy-columns { column-count: 2; } }
+@media (max-width: 767.98px) { .taxonomy-columns { column-count: 1; } }
+.taxonomy-columns > .taxonomy-item { break-inside: avoid; margin-bottom: 1rem; }
+.taxonomy-frozen { display: flex; gap: 1rem; align-items: flex-start; }
+.taxonomy-frozen-col { flex: 1; min-width: 0; }
+.taxonomy-frozen-col > .taxonomy-item { margin-bottom: 1rem; }
+.search-box { max-width: 500px; }
+footer a { color: var(--brand-magenta); }
+</style>
+</head>
+<body>
+
+<!-- Brand Bar -->
+<nav class="brand-bar py-3 mb-4">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between">
+      <div>
+        <h1 class="text-white mb-0"><i class="bi bi-bar-chart-fill me-2" style="color: var(--brand-magenta);"></i>Media Taxonomy</h1>
+        <span class="subtitle">Standardised media channels, formats, publishers, and funnel stages for Market Mix Modelling</span>
+      </div>
+      <span class="badge bg-light text-dark">v1.0 &middot; March 2026</span>
+    </div>
+  </div>
+</nav>
+
+<div class="container pb-5">
+
+  <!-- Search -->
+  <div class="search-box mb-3">
+    <div class="input-group">
+      <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+      <input type="text" id="search" class="form-control" placeholder="Search names...">
+    </div>
+  </div>
+
+  <!-- Tab Pills -->
+  <ul class="nav nav-pills mb-3" id="tabNav">
+    <li class="nav-item"><a class="nav-link active" href="#" data-tab="channels">Channels <span class="badge bg-light text-dark ms-1" id="count-channels"></span></a></li>
+    <li class="nav-item"><a class="nav-link" href="#" data-tab="publishers">Publishers <span class="badge bg-secondary ms-1" id="count-publishers"></span></a></li>
+    <li class="nav-item"><a class="nav-link" href="#" data-tab="formats">Formats <span class="badge bg-secondary ms-1" id="count-formats"></span></a></li>
+    <li class="nav-item"><a class="nav-link" href="#" data-tab="geography">Geography <span class="badge bg-secondary ms-1" id="count-geography"></span></a></li>
+    <li class="nav-item"><a class="nav-link" href="#" data-tab="funnels">Funnel Stages <span class="badge bg-secondary ms-1" id="count-funnels"></span></a></li>
+  </ul>
+
+  <!-- Summary -->
+  <p class="text-muted small mb-3" id="summary"></p>
+
+  <!-- Content container -->
+  <div id="content"></div>
+
+</div>
+
+<footer class="py-4 border-top bg-white">
+  <div class="container text-center text-muted small">
+    <p class="mb-1">Built by <a href="https://dataos.com.au" target="_blank">DataOS</a> &middot; 48 channels &middot; 151 publishers &middot; 126 formats &middot; 36 geography values &middot; 3 funnel stages</p>
+    <p class="mb-0">This taxonomy is designed for Australian paid media Market Mix Modelling.</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ── Embedded Taxonomy Data ──────────────────────────────────────────
+
+const CHANNELS = ["Affiliates","Aggregators","AI Powered","AVOD","Branded Search","BVOD","Cinema","Competitor Search","Demand Gen","Digital Audio","Display","EDM","FTA TV","Letterboxing","LinkedIn","Magazines","Meta","Native Articles","Newspapers","Non Branded Search","OOH Lifestyle","OOH Retail","OOH Roadside","OOH Transport","Pinterest","Podcasts","Radio","Reddit","Retail Aisle","Retail Catalogue","Retail Online","Shopping Search","SMS","Snapchat","Sponsorship Events","Sponsorship Experiential","Sponsorship Integration","Sponsorship Sports Team","Sponsorship Stadium","Sponsorship TV","Sponsorship Video Game","STV","SVOD","Telemarketing","TikTok","Twitter/X","Video Online","YouTube"];
+
+const PUBLISHERS = {"Affiliates":["Canstar","Commission Factory","Compare Club","Compare The Market","Finder","Honey","Mozo","Points Hack","Product Review","RateCity","Shopzilla","Whistleout"],"Aggregators":["Cashback","Catch","Etsy","Fiverr","Impact","Rakuten","Shopback","Uber"],"AI Powered":["Google","Microsoft"],"AVOD":["Tubi"],"Branded Search":["Google","Yandex","Microsoft","Yahoo"],"BVOD":["Nine","SBS","Samba TV","Seven","Ten","DV360","Samsung Ads","LG Ads"],"Cinema":["Val Morgan"],"Competitor Search":["Google","Yandex","Microsoft","Yahoo"],"Demand Gen":["Google"],"Digital Audio":["ARN","Mixcloud","Nova","SCA","Soundcloud","Spotify","TripleM","TuneIn"],"Display":["BigAds","Criteo","Taboola","Google","GumGum","JustEggs","Kargo","LG Ads","Mamamia","MiQ","Outbrain","Pedestrian TV","Quantcast","Samba TV","Samsung Ads","The Trade Desk","Yahoo"],"EDM":["Campaign Monitor","Hubspot","MailChimp","Marketo","Pardot","Salesforce","Brevo","Swift","Twilio"],"FTA TV":["Nine","SBS","Seven","Ten","WIN"],"Letterboxing":["Various"],"LinkedIn":["LinkedIn"],"Magazines":["ACM","ARE Media","Hardie Grant","Medium Rare","Momentum Media","Newscorp","Next Media","Niche Media","Pacific Magazines","Universal Media","The Brag Media"],"Meta":["Facebook","Instagram","Meta"],"Native Articles":["Broadsheet","Buzzfeed","Guardian","Mamamia","Microsoft","Newscorp","Nine","SBS","Urban List","Val Morgan"],"Newspapers":["ACM","Guardian","Newscorp","Nine","Seven","The Australian","The New Daily"],"Non Branded Search":["Google","Microsoft","Yahoo","Yandex"],"OOH Lifestyle":["Civic Outdoor","JCDecaux","QMS","Total Outdoor Media","Val Morgan","Scentre Group","Vicinity Centres","oOh! Media","Motio","The Media Shop"],"OOH Retail":["Cartology","Civic Outdoor","Coles 360","JCDecaux","QMS","Shopper","Total Outdoor Media","Val Morgan","Scentre Group","Vicinity Centres","oOh! Media","Motio","The Media Shop","Coles","Woolworths"],"OOH Roadside":["Civic Outdoor","JCDecaux","QMS","Total Outdoor Media","Val Morgan","Scentre Group","oOh! Media","Gipps Media","TMS/The Media Shop","Big Outdoor"],"OOH Transport":["Civic Outdoor","JCDecaux","QMS","Total Outdoor Media","Val Morgan","Scentre Group","oOh! Media","GoTransit","S&J Media Group","Torch Media"],"Pinterest":["Pinterest"],"Podcasts":["ACast","ARN","Mamamia","Nova","PodShape","PodcastOne","Ranieri&Co","SCA","Shameless Media","Spotify","Whooshka"],"Radio":["ACE Radio","ARN","JoyFM","Nova","SCA","SEN","Croc","ATN","Super Radio Network"],"Reddit":["Reddit"],"Retail Aisle":["Cartology","Chemist Warehouse","Citrus Ads","Coles 360","Go Local"],"Retail Catalogue":["Cartology","Chemist Warehouse","Citrus Ads","Coles 360","Go Local"],"Retail Online":["Amazon","Cartology","Chemist Warehouse","Citrus Ads","Coles 360","Criteo","Go Local"],"Shopping Search":["Google","Microsoft"],"SMS":["Hubspot","MailChimp","Marketo","Salesforce","Twilio"],"Snapchat":["Snapchat"],"Sponsorship Events":["Various"],"Sponsorship Experiential":["Various"],"Sponsorship Integration":["Foxtel","Kayo","Nine","SBS","Seven","Ten"],"Sponsorship Sports Team":["Various"],"Sponsorship Stadium":["Various"],"Sponsorship TV":["Foxtel","Kayo","Nine","SBS","Seven","Ten"],"Sponsorship Video Game":["Activision Blizzard","Adverty","Anzu.io","Bidstack","EA","Epic Games","Frameplay","Livewire","Riot Games","Ubisoft"],"STV":["Foxtel","ESPN"],"SVOD":["Amazon","Apple TV","Binge","Disney+","Foxtel","ESPN","Kayo","Netflix","Optus Sport","Paramount+","Prime Video"],"Telemarketing":["Thomas Direct"],"TikTok":["TikTok"],"Twitter/X":["X"],"Video Online":["Amazon","Criteo","Daily Motion","Mamamia","Newscorp","Vevo","Vimeo","Yahoo","The Trade Desk"],"YouTube":["Google"]};
+
+const FORMATS = {"Affiliates":["Affiliates","Banners","Coupon Codes","Text Links"],"Aggregators":["Banners","Product Listing","Sponsored Listing","Text Links"],"AI Powered":["Demand Gen Carousel","Demand Gen Multi Asset","Demand Gen VAC","Discovery","Local","PMAX","App Promo Engage","App Promo Install","Demand Gen"],"AVOD":["5s","6s","10s","15s","30s","60s","Pause Ad","Video"],"Branded Search":["Dynamic Search","Responsive Search","Text Ad"],"BVOD":["5s","6s","10s","15s","30s","Pause Ad","Video"],"Cinema":["15s","30s","60s","Video"],"Competitor Search":["Dynamic Search","Responsive Search","Text Ad"],"Demand Gen":["Demand Gen Carousel","Demand Gen Multi Asset","Demand Gen VAC"],"Digital Audio":["Audio","Live Reads","Mid Roll","Post Roll","Pre Roll"],"Display":["Mobile Banner","Full Banner","Discovery","HPTO","Leaderboard","MREC","Rich Media","Roadblock","In-feed Video","Skyscraper","Wide Skyscraper","Large Rectangle","Half Page","Billboard Display","Large Leaderboard","Square","Small Square","Portrait","Panorama","Mobile Interstitial","Static"],"EDM":["EDM","Static","Text Ad","Video"],"FTA TV":["5s","6s","10s","15s","30s","60s","Video"],"Letterboxing":["Insert","Brochure","Flyers"],"LinkedIn":["Carousel","Static","Sponsored Post","Video"],"Magazines":["Classified","DPS","Full Page","Half Page","IFC","Inserts","Quarter Page"],"Meta":["Carousel","Collection","Static","Video","Dynamic Paid Ads"],"Native Articles":["Content","Listicle","Native Articles"],"Newspapers":["Classified","DPS","Full Page","Half Page","IFC","Inserts","Quarter Page","Column"],"Non Branded Search":["Dynamic Search","Responsive Search","Text Ad"],"OOH Lifestyle":["Small Format","Large Format","Digital Large Format","Digital Small Format","Floor Decals","Landscape","Portrait","Special Builds"],"OOH Retail":["Small Format","Large Format","Digital Large Format","Digital Small Format","Floor Decals","Landscape","Portrait","Special Builds"],"OOH Roadside":["Small Format","Large Format","Digital Small Format","Digital Large Format","Digital Street Furniture","Mobile Billboards","Street Furniture","Wall Murals"],"OOH Transport":["Airport","Bus Shelter","Bus Sides","Bus Wrap","Digital Large Format","Digital Small Format","Kiosk","Large Format","Small Format","Station Domination","Train Wraps","Tram Wrap"],"Pinterest":["Carousel","Static","Video"],"Podcasts":["Audio","Live Reads","Mid Roll","Post Roll","Pre Roll"],"Radio":["5s","6s","10s","15s","30s","60s","Audio","Live Reads"],"Reddit":["Static","Sponsored Post","Video"],"Retail Aisle":["Dump Bins","ESL","Endcap Displays","Shelf Strips","Shelf Talkers","Wobblers"],"Retail Catalogue":["DPS","Full Page","Half Page","Inserts","Quarter Page"],"Retail Online":["HPTO","Product Listing","Responsive Search Ads","Sponsored Listing","Video"],"Shopping Search":["Shopping","Text","Product Listing","Local Inventory","Hotel"],"SMS":["SMS"],"Snapchat":["Carousel","Collection","Static","Lens","Video"],"Sponsorship Events":["Logo on Ticket","Hosted Site","Event Stall"],"Sponsorship Experiential":["Pop Up","Stall"],"Sponsorship Integration":["Logo on Screen","Verbal Mention","Host Live Read","Product Placement"],"Sponsorship Sports Team":["Name Sponsor","Jersey Logo"],"Sponsorship Stadium":["Digital Banners","On Field Logo","Stadium Name"],"Sponsorship TV":["Logo on Screen","Verbal Mention","Host Live Read","Product Placement"],"Sponsorship Video Game":["Logo Placement","Product Placement","Verbal Mention"],"STV":["5s","6s","10s","15s","30s","60s","Video"],"SVOD":["5s","6s","10s","15s","30s","60s","Pause Ad","Video"],"Telemarketing":["Telemarketing"],"TikTok":["Collection","Static","Lens","6s","10s","15s","20s","30s","60s"],"Twitter/X":["Carousel","Static","Sponsored Post","Video"],"Video Online":["5s","6s","10s","15s","30s","Video"],"YouTube":["Trueview In Stream","Trueview Non Skippable","VAC","VRC","Bumper","Reserve Skippable","Reserve Non Skippable","Masthead","Audio"]};
+
+const FUNNELS = {"Affiliates":[{"stage":"Conversion","is_primary":true}],"Aggregators":[{"stage":"Conversion","is_primary":true}],"AI Powered":[{"stage":"Conversion","is_primary":true}],"AVOD":[{"stage":"Awareness","is_primary":true}],"Branded Search":[{"stage":"Conversion","is_primary":true}],"BVOD":[{"stage":"Awareness","is_primary":true}],"Cinema":[{"stage":"Awareness","is_primary":true}],"Competitor Search":[{"stage":"Conversion","is_primary":true}],"Demand Gen":[{"stage":"Consideration","is_primary":false},{"stage":"Conversion","is_primary":true}],"Digital Audio":[{"stage":"Awareness","is_primary":true},{"stage":"Consideration","is_primary":false},{"stage":"Conversion","is_primary":false}],"Display":[{"stage":"Awareness","is_primary":false},{"stage":"Consideration","is_primary":false},{"stage":"Conversion","is_primary":true}],"EDM":[{"stage":"Awareness","is_primary":true},{"stage":"Consideration","is_primary":false},{"stage":"Conversion","is_primary":false}],"FTA TV":[{"stage":"Awareness","is_primary":true}],"Letterboxing":[{"stage":"Awareness","is_primary":true}],"LinkedIn":[{"stage":"Awareness","is_primary":true},{"stage":"Consideration","is_primary":false},{"stage":"Conversion","is_primary":false}],"Magazines":[{"stage":"Awareness","is_primary":true}],"Meta":[{"stage":"Awareness","is_primary":false},{"stage":"Consideration","is_primary":false},{"stage":"Conversion","is_primary":false}],"Native Articles":[{"stage":"Awareness","is_primary":true},{"stage":"Consideration","is_primary":false},{"stage":"Conversion","is_primary":false}],"Newspapers":[{"stage":"Awareness","is_primary":true}],"Non Branded Search":[{"stage":"Conversion","is_primary":true}],"OOH Lifestyle":[{"stage":"Awareness","is_primary":true}],"OOH Retail":[{"stage":"Awareness","is_primary":true}],"OOH Roadside":[{"stage":"Awareness","is_primary":true}],"OOH Transport":[{"stage":"Awareness","is_primary":true}],"Pinterest":[{"stage":"Awareness","is_primary":true},{"stage":"Consideration","is_primary":false},{"stage":"Conversion","is_primary":false}],"Podcasts":[{"stage":"Awareness","is_primary":true}],"Radio":[{"stage":"Awareness","is_primary":true}],"Reddit":[{"stage":"Awareness","is_primary":true},{"stage":"Consideration","is_primary":false},{"stage":"Conversion","is_primary":false}],"Retail Aisle":[{"stage":"Awareness","is_primary":true}],"Retail Catalogue":[{"stage":"Awareness","is_primary":true}],"Retail Online":[{"stage":"Conversion","is_primary":true}],"Shopping Search":[{"stage":"Conversion","is_primary":true}],"SMS":[{"stage":"Conversion","is_primary":true}],"Snapchat":[{"stage":"Awareness","is_primary":true},{"stage":"Consideration","is_primary":false},{"stage":"Conversion","is_primary":false}],"Sponsorship Events":[{"stage":"Awareness","is_primary":true}],"Sponsorship Experiential":[{"stage":"Awareness","is_primary":true}],"Sponsorship Integration":[{"stage":"Awareness","is_primary":true}],"Sponsorship Sports Team":[{"stage":"Awareness","is_primary":true}],"Sponsorship Stadium":[{"stage":"Awareness","is_primary":true}],"Sponsorship TV":[{"stage":"Awareness","is_primary":true}],"Sponsorship Video Game":[{"stage":"Awareness","is_primary":true}],"STV":[{"stage":"Awareness","is_primary":true}],"SVOD":[{"stage":"Awareness","is_primary":true}],"Telemarketing":[{"stage":"Conversion","is_primary":true}],"TikTok":[{"stage":"Awareness","is_primary":true},{"stage":"Consideration","is_primary":false},{"stage":"Conversion","is_primary":false}],"Twitter/X":[{"stage":"Awareness","is_primary":true},{"stage":"Consideration","is_primary":false},{"stage":"Conversion","is_primary":false}],"Video Online":[{"stage":"Awareness","is_primary":true},{"stage":"Consideration","is_primary":false},{"stage":"Conversion","is_primary":false}],"YouTube":[{"stage":"Awareness","is_primary":true},{"stage":"Consideration","is_primary":false},{"stage":"Conversion","is_primary":false}]};
+
+const GEOGRAPHY = [{"name":"ACT","country":"AU"},{"name":"Auckland","country":"NZ"},{"name":"Bay of Plenty","country":"NZ"},{"name":"Canterbury","country":"NZ"},{"name":"East Midlands","country":"GB"},{"name":"Hawke\u0027s Bay","country":"NZ"},{"name":"London","country":"GB"},{"name":"Manawatu-Wanganui","country":"NZ"},{"name":"National","country":"AU"},{"name":"North East","country":"GB"},{"name":"North West","country":"GB"},{"name":"Northern Ireland","country":"GB"},{"name":"NSW","country":"AU"},{"name":"NSW Metro","country":"AU"},{"name":"NSW Regional","country":"AU"},{"name":"NT","country":"AU"},{"name":"Otago","country":"NZ"},{"name":"QLD","country":"AU"},{"name":"QLD Metro","country":"AU"},{"name":"QLD Regional","country":"AU"},{"name":"SA","country":"AU"},{"name":"Scotland","country":"GB"},{"name":"South East","country":"GB"},{"name":"South West","country":"GB"},{"name":"TAS","country":"AU"},{"name":"VIC","country":"AU"},{"name":"VIC Metro","country":"AU"},{"name":"VIC Regional","country":"AU"},{"name":"WA","country":"AU"},{"name":"WA Metro","country":"AU"},{"name":"WA Regional","country":"AU"},{"name":"Waikato","country":"NZ"},{"name":"Wales","country":"GB"},{"name":"Wellington","country":"NZ"},{"name":"West Midlands","country":"GB"},{"name":"Yorkshire","country":"GB"}];
+
+
+// ── Derived data ────────────────────────────────────────────────────
+
+// Build publisher → channels reverse lookup
+const PUB_TO_CHANNELS = {};
+for (const [ch, pubs] of Object.entries(PUBLISHERS)) {
+    for (const p of pubs) {
+        if (!PUB_TO_CHANNELS[p]) PUB_TO_CHANNELS[p] = [];
+        if (!PUB_TO_CHANNELS[p].includes(ch)) PUB_TO_CHANNELS[p].push(ch);
+    }
+}
+const UNIQUE_PUBLISHERS = Object.keys(PUB_TO_CHANNELS).sort();
+
+// Build format → channels reverse lookup
+const FMT_TO_CHANNELS = {};
+for (const [ch, fmts] of Object.entries(FORMATS)) {
+    for (const f of fmts) {
+        if (!FMT_TO_CHANNELS[f]) FMT_TO_CHANNELS[f] = [];
+        if (!FMT_TO_CHANNELS[f].includes(ch)) FMT_TO_CHANNELS[f].push(ch);
+    }
+}
+const UNIQUE_FORMATS = Object.keys(FMT_TO_CHANNELS).sort();
+
+// Build funnel → channels reverse lookup
+const FUNNEL_STAGES = ['Awareness', 'Consideration', 'Conversion'];
+const FUNNEL_TO_CHANNELS = {};
+for (const stage of FUNNEL_STAGES) {
+    FUNNEL_TO_CHANNELS[stage] = [];
+    for (const [ch, stages] of Object.entries(FUNNELS)) {
+        const match = stages.find(s => s.stage === stage);
+        if (match) FUNNEL_TO_CHANNELS[stage].push({ name: ch, is_primary: match.is_primary });
+    }
+    FUNNEL_TO_CHANNELS[stage].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+
+// ── Rendering ───────────────────────────────────────────────────────
+
+let currentTab = 'channels';
+
+function esc(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+}
+
+function funnelClass(stage) {
+    if (stage === 'Awareness') return 'badge-funnel-awareness';
+    if (stage === 'Consideration') return 'badge-funnel-consideration';
+    return 'badge-funnel-conversion';
+}
+
+function renderChannels(search) {
+    const filtered = CHANNELS.filter(ch => !search || ch.toLowerCase().includes(search));
+    let html = '<div class="taxonomy-columns taxonomy-accordion">';
+    filtered.forEach((ch, i) => {
+        const pubs = PUBLISHERS[ch] || [];
+        const fmts = FORMATS[ch] || [];
+        const funs = FUNNELS[ch] || [];
+        html += `<div class="taxonomy-item" data-name="${esc(ch.toLowerCase())}">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center"
+                     data-bs-toggle="collapse" data-bs-target="#ch-${i}" role="button">
+                    <span class="fw-semibold">${esc(ch)}</span>
+                    <i class="bi bi-chevron-down small"></i>
+                </div>
+                <div class="card-body py-2 border-bottom">
+                    <div class="d-flex flex-wrap gap-1 align-items-center">
+                        ${funs.map(f => `<span class="badge ${funnelClass(f.stage)}${f.is_primary ? ' border border-2 border-dark' : ''}" style="font-size:0.7em">${esc(f.stage)}${f.is_primary ? ' *' : ''}</span>`).join('')}
+                        <span class="text-muted small ms-1">${pubs.length} publishers &middot; ${fmts.length} formats</span>
+                    </div>
+                </div>
+                <div id="ch-${i}" class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="mb-3">
+                            <label class="text-muted small fw-bold d-block mb-1">Publishers (${pubs.length})</label>
+                            <div class="d-flex flex-wrap gap-1">
+                                ${pubs.map(p => `<span class="badge bg-light text-dark border" style="font-size:0.75em">${esc(p)}</span>`).join('')}
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-muted small fw-bold d-block mb-1">Formats (${fmts.length})</label>
+                            <div class="d-flex flex-wrap gap-1">
+                                ${fmts.map(f => `<span class="badge bg-light text-dark border" style="font-size:0.75em">${esc(f)}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    });
+    html += '</div>';
+    return { html, count: filtered.length, label: 'channel' };
+}
+
+function renderPublishers(search) {
+    const filtered = UNIQUE_PUBLISHERS.filter(p => !search || p.toLowerCase().includes(search));
+    let html = '<div class="taxonomy-columns taxonomy-accordion">';
+    filtered.forEach((pub, i) => {
+        const channels = PUB_TO_CHANNELS[pub] || [];
+        html += `<div class="taxonomy-item" data-name="${esc(pub.toLowerCase())}">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center"
+                     data-bs-toggle="collapse" data-bs-target="#pub-${i}" role="button">
+                    <span class="fw-semibold">${esc(pub)}</span>
+                    <i class="bi bi-chevron-down small"></i>
+                </div>
+                <div class="card-body py-2 border-bottom">
+                    <div class="d-flex flex-wrap gap-1">
+                        ${channels.map(ch => `<span class="badge bg-light text-dark border" style="font-size:0.7em">${esc(ch)}</span>`).join('')}
+                    </div>
+                </div>
+                <div id="pub-${i}" class="collapse">
+                    <div class="card-body py-2">
+                        <label class="text-muted small fw-bold d-block mb-1">Available in ${channels.length} channel${channels.length !== 1 ? 's' : ''}</label>
+                        <div class="d-flex flex-wrap gap-1">
+                            ${channels.map(ch => `<span class="badge bg-light text-dark border" style="font-size:0.75em">${esc(ch)}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    });
+    html += '</div>';
+    return { html, count: filtered.length, label: 'publisher' };
+}
+
+function renderFormats(search) {
+    const filtered = UNIQUE_FORMATS.filter(f => !search || f.toLowerCase().includes(search));
+    let html = '<div class="taxonomy-columns taxonomy-accordion">';
+    filtered.forEach((fmt, i) => {
+        const channels = FMT_TO_CHANNELS[fmt] || [];
+        const show = channels.slice(0, 4);
+        const more = channels.length - 4;
+        html += `<div class="taxonomy-item" data-name="${esc(fmt.toLowerCase())}">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center"
+                     data-bs-toggle="collapse" data-bs-target="#fmt-${i}" role="button">
+                    <span class="fw-semibold">${esc(fmt)}</span>
+                    <i class="bi bi-chevron-down small"></i>
+                </div>
+                <div class="card-body py-2 border-bottom">
+                    <div class="d-flex flex-wrap gap-1">
+                        ${show.map(ch => `<span class="badge bg-light text-dark border" style="font-size:0.7em">${esc(ch)}</span>`).join('')}
+                        ${more > 0 ? `<span class="badge bg-light text-muted border" style="font-size:0.7em">+${more} more</span>` : ''}
+                    </div>
+                </div>
+                <div id="fmt-${i}" class="collapse">
+                    <div class="card-body py-2">
+                        <label class="text-muted small fw-bold d-block mb-1">Available in ${channels.length} channel${channels.length !== 1 ? 's' : ''}</label>
+                        <div class="d-flex flex-wrap gap-1">
+                            ${channels.map(ch => `<span class="badge bg-light text-dark border" style="font-size:0.75em">${esc(ch)}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    });
+    html += '</div>';
+    return { html, count: filtered.length, label: 'format' };
+}
+
+function renderGeography(search) {
+    const filtered = GEOGRAPHY.filter(g => !search || g.name.toLowerCase().includes(search));
+    let html = '<div class="taxonomy-columns taxonomy-accordion">';
+    filtered.forEach((geo, i) => {
+        html += `<div class="taxonomy-item" data-name="${esc(geo.name.toLowerCase())}">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center"
+                     data-bs-toggle="collapse" data-bs-target="#geo-${i}" role="button">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-semibold">${esc(geo.name)}</span>
+                        <span class="badge bg-success text-white" style="font-size:0.7em">${esc(geo.country)}</span>
+                    </div>
+                    <i class="bi bi-chevron-down small"></i>
+                </div>
+                <div id="geo-${i}" class="collapse">
+                    <div class="card-body py-2">
+                        <span class="text-muted small">Country: <strong>${esc(geo.country)}</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    });
+    html += '</div>';
+    return { html, count: filtered.length, label: 'geography value' };
+}
+
+function renderFunnels(search) {
+    const filtered = FUNNEL_STAGES.filter(s => !search || s.toLowerCase().includes(search));
+    let html = '<div class="taxonomy-columns taxonomy-accordion">';
+    filtered.forEach((stage, i) => {
+        const channels = FUNNEL_TO_CHANNELS[stage] || [];
+        html += `<div class="taxonomy-item" data-name="${esc(stage.toLowerCase())}">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center"
+                     data-bs-toggle="collapse" data-bs-target="#fun-${i}" role="button">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-semibold badge fs-6 ${funnelClass(stage)}">${esc(stage)}</span>
+                        <span class="text-muted small">${channels.length} channels</span>
+                    </div>
+                    <i class="bi bi-chevron-down small"></i>
+                </div>
+                <div id="fun-${i}" class="collapse">
+                    <div class="card-body py-2">
+                        <label class="text-muted small fw-bold d-block mb-1">Channels</label>
+                        <div class="d-flex flex-wrap gap-1">
+                            ${channels.map(ch => `<span class="badge bg-light text-dark border ${ch.is_primary ? 'border-2 border-dark' : ''}" style="font-size:0.75em">${esc(ch.name)}${ch.is_primary ? ' *' : ''}</span>`).join('')}
+                        </div>
+                        <small class="text-muted">* = primary stage for that channel</small>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    });
+    html += '</div>';
+    return { html, count: filtered.length, label: 'funnel stage' };
+}
+
+function render() {
+    const search = document.getElementById('search').value.trim().toLowerCase();
+    const renderers = {
+        channels: renderChannels,
+        publishers: renderPublishers,
+        formats: renderFormats,
+        geography: renderGeography,
+        funnels: renderFunnels
+    };
+    const result = renderers[currentTab](search);
+    document.getElementById('content').innerHTML = result.html;
+    document.getElementById('summary').textContent =
+        result.count + ' ' + result.label + (result.count !== 1 ? 's' : '') +
+        (search ? ' matching "' + search + '"' : '');
+
+    // Freeze columns
+    document.querySelectorAll('.taxonomy-columns').forEach(container => {
+        const items = Array.from(container.querySelectorAll(':scope > .taxonomy-item'));
+        if (!items.length) return;
+        const buckets = {};
+        items.forEach(item => {
+            const left = Math.round(item.getBoundingClientRect().left);
+            if (!buckets[left]) buckets[left] = [];
+            buckets[left].push(item);
+        });
+        const cols = Object.keys(buckets).sort((a, b) => a - b).map(k => buckets[k]);
+        container.classList.remove('taxonomy-columns');
+        container.classList.add('taxonomy-frozen');
+        container.innerHTML = '';
+        cols.forEach(colItems => {
+            const colDiv = document.createElement('div');
+            colDiv.className = 'taxonomy-frozen-col';
+            colItems.forEach(item => colDiv.appendChild(item));
+            container.appendChild(colDiv);
+        });
+    });
+
+    // Accordion behaviour
+    document.querySelectorAll('.taxonomy-accordion').forEach(container => {
+        container.addEventListener('show.bs.collapse', e => {
+            container.querySelectorAll('.collapse.show').forEach(open => {
+                if (open !== e.target) bootstrap.Collapse.getOrCreateInstance(open).hide();
+            });
+        });
+    });
+}
+
+// ── Tab counts ──
+document.getElementById('count-channels').textContent = CHANNELS.length;
+document.getElementById('count-publishers').textContent = UNIQUE_PUBLISHERS.length;
+document.getElementById('count-formats').textContent = UNIQUE_FORMATS.length;
+document.getElementById('count-geography').textContent = GEOGRAPHY.length;
+document.getElementById('count-funnels').textContent = FUNNEL_STAGES.length;
+
+// ── Tab switching ──
+document.getElementById('tabNav').addEventListener('click', e => {
+    const link = e.target.closest('[data-tab]');
+    if (!link) return;
+    e.preventDefault();
+    currentTab = link.dataset.tab;
+    document.querySelectorAll('#tabNav .nav-link').forEach(el => {
+        const isActive = el.dataset.tab === currentTab;
+        el.classList.toggle('active', isActive);
+        const badge = el.querySelector('.badge');
+        if (badge) {
+            badge.className = 'badge ms-1 ' + (isActive ? 'bg-light text-dark' : 'bg-secondary');
+        }
+    });
+    document.getElementById('search').value = '';
+    render();
+});
+
+// ── Search ──
+let searchTimeout;
+document.getElementById('search').addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(render, 200);
+});
+
+// ── Initial render ──
+render();
+</script>
+</body>
+</html>
