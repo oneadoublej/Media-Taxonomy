@@ -20,13 +20,15 @@ body { background: #f8f9fa; font-family: system-ui, -apple-system, sans-serif; }
 .badge-funnel-awareness { background: #0dcaf0; color: #000; }
 .badge-funnel-consideration { background: #ffc107; color: #000; }
 .badge-funnel-conversion { background: #198754; color: #fff; }
-.taxonomy-columns { column-count: 3; column-gap: 1rem; }
-@media (max-width: 1199.98px) { .taxonomy-columns { column-count: 2; } }
-@media (max-width: 767.98px) { .taxonomy-columns { column-count: 1; } }
-.taxonomy-columns > .taxonomy-item { break-inside: avoid; margin-bottom: 1rem; }
-.taxonomy-frozen { display: flex; gap: 1rem; align-items: flex-start; }
+/* CSS Grid — fills row-by-row (alphabetical left→right) */
+.taxonomy-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; align-items: start; }
+@media (max-width: 1199.98px) { .taxonomy-columns { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 767.98px) { .taxonomy-columns { grid-template-columns: 1fr; } }
+/* Frozen layout (applied by JS after detecting grid positions) */
+.taxonomy-frozen { display: flex; gap: 1rem; }
 .taxonomy-frozen-col { flex: 1; min-width: 0; }
 .taxonomy-frozen-col > .taxonomy-item { margin-bottom: 1rem; }
+@media (max-width: 767.98px) { .taxonomy-frozen { flex-direction: column; } }
 .search-box { max-width: 500px; }
 footer a { color: var(--brand-magenta); }
 </style>
@@ -328,25 +330,30 @@ function render() {
         result.count + ' ' + result.label + (result.count !== 1 ? 's' : '') +
         (search ? ' matching "' + search + '"' : '');
 
-    // Freeze columns
-    document.querySelectorAll('.taxonomy-columns').forEach(container => {
-        const items = Array.from(container.querySelectorAll(':scope > .taxonomy-item'));
-        if (!items.length) return;
-        const buckets = {};
-        items.forEach(item => {
-            const left = Math.round(item.getBoundingClientRect().left);
-            if (!buckets[left]) buckets[left] = [];
-            buckets[left].push(item);
-        });
-        const cols = Object.keys(buckets).sort((a, b) => a - b).map(k => buckets[k]);
-        container.classList.remove('taxonomy-columns');
-        container.classList.add('taxonomy-frozen');
-        container.innerHTML = '';
-        cols.forEach(colItems => {
-            const colDiv = document.createElement('div');
-            colDiv.className = 'taxonomy-frozen-col';
-            colItems.forEach(item => colDiv.appendChild(item));
-            container.appendChild(colDiv);
+    // Freeze columns — deferred to rAF so the grid layout is computed first
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            document.querySelectorAll('.taxonomy-columns').forEach(container => {
+                const items = Array.from(container.querySelectorAll(':scope > .taxonomy-item'));
+                if (!items.length) return;
+                const buckets = {};
+                items.forEach(item => {
+                    const left = Math.round(item.getBoundingClientRect().left);
+                    if (!buckets[left]) buckets[left] = [];
+                    buckets[left].push(item);
+                });
+                const cols = Object.keys(buckets).sort((a, b) => a - b).map(k => buckets[k]);
+                if (cols.length <= 1) return;
+                container.classList.remove('taxonomy-columns');
+                container.classList.add('taxonomy-frozen');
+                container.innerHTML = '';
+                cols.forEach(colItems => {
+                    const colDiv = document.createElement('div');
+                    colDiv.className = 'taxonomy-frozen-col';
+                    colItems.forEach(item => colDiv.appendChild(item));
+                    container.appendChild(colDiv);
+                });
+            });
         });
     });
 
